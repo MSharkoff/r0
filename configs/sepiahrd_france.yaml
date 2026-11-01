@@ -1,0 +1,77 @@
+# Modèle SEPIAHRD par âge, configuration par défaut pour une maladie
+# respiratoire de type COVID-19.
+#
+# ATTENTION : les populations, la matrice de contacts et les probabilités par
+# âge ci-dessous sont des ORDRES DE GRANDEUR ILLUSTRATIFS, pas des données
+# sourcées. Ils seront remplacés par des données INSEE et des matrices de
+# contacts publiées (phase 3 de la feuille de route).
+name: SEPIAHRD France (valeurs illustratives)
+description: >
+  Susceptibles, Exposés, Pré-symptomatiques, Infectés symptomatiques et
+  asymptomatiques, Hospitalisés, Rétablis, Décédés ; cinq classes d'âge ;
+  durées d'Erlang.
+R0: 2.5
+infection:
+  susceptible: S
+  target: E
+compartments:
+  S:
+    label: Susceptibles
+  E:
+    label: Exposés (latence)
+    duration: 3
+    stages: 3
+    transitions:
+      - to: P
+  P:
+    label: Pré-symptomatiques
+    duration: 2
+    stages: 2
+    infectiousness: 1.0
+    transitions:
+      - to: Ia
+        # part d'asymptomatiques par âge : 0-19, 20-39, 40-59, 60-79, 80+
+        probability: [0.6, 0.45, 0.35, 0.25, 0.2]
+      - to: Is
+  Is:
+    label: Infectés symptomatiques
+    duration: 5
+    stages: 3
+    infectiousness: 1.0
+    transitions:
+      - to: H
+        # probabilité d'hospitalisation d'un cas symptomatique
+        probability: [0.002, 0.01, 0.04, 0.12, 0.3]
+      - to: R
+  Ia:
+    label: Infectés asymptomatiques
+    duration: 5
+    stages: 3
+    infectiousness: 0.5
+    transitions:
+      - to: R
+  H:
+    label: Hospitalisés
+    duration: 10
+    stages: 2
+    transitions:
+      - to: D
+        # létalité à l'hôpital
+        probability: [0.01, 0.02, 0.06, 0.18, 0.35]
+      - to: R
+  R:
+    label: Rétablis
+  D:
+    label: Décédés
+population:
+  age_groups: ["0-19", "20-39", "40-59", "60-79", "80+"]
+  sizes: [15700000, 15600000, 17000000, 14600000, 4200000]
+  # contacts quotidiens d'une personne de la ligne avec la colonne
+  contacts:
+    - [7.0, 2.5, 2.5, 1.0, 0.2]
+    - [2.5, 5.0, 3.0, 1.0, 0.2]
+    - [2.3, 2.8, 4.0, 1.5, 0.3]
+    - [1.1, 1.1, 1.7, 2.5, 0.5]
+    - [0.8, 0.8, 1.2, 1.7, 1.0]
+initial:
+  E: 100
