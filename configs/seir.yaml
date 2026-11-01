@@ -1,0 +1,30 @@
+# SEIR classique, une seule population homogène.
+# Sert de référence : ses résultats se comparent aux formules analytiques.
+name: SEIR de référence
+description: Modèle SEIR à durées exponentielles, population homogène.
+R0: 2.5
+infection:
+  susceptible: S
+  target: E
+compartments:
+  S:
+    label: Susceptibles
+  E:
+    label: Exposés (latence)
+    duration: 3
+    transitions:
+      - to: I
+  I:
+    label: Infectieux
+    duration: 5
+    infectiousness: 1.0
+    transitions:
+      - to: R
+  R:
+    label: Rétablis
+population:
+  age_groups: [tous]
+  sizes: [1000000]
+  contacts: [[10.0]]
+initial:
+  E: 10
